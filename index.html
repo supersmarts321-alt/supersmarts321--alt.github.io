@@ -220,7 +220,7 @@
                 contact: n,
                 phone: p,
                 email: e || 'no@email.com',
-                lang: 'il', 
+                // הסרנו את lang לגמרי כדי למנוע את שגיאת Language Unsupported
                 original_return_method: 'GET',
                 success_url: window.location.origin + window.location.pathname + '?thankyou=1',
                 error_url: window.location.origin + window.location.pathname
@@ -232,8 +232,7 @@
         function showSuccess() {
             document.body.innerHTML = '';
             document.body.style.background = '#f0fdf4';
-            
-            const o = JSON.parse(localStorage.getItem('last_order')) || { name: "לקוח", total: "0.00", waItems: "", location: "לא נבחר" };
+            const o = JSON.parse(localStorage.getItem('last_order')) || { name: "לקוח", total: "0.00", waItems: "", location: "כללי" };
             let msg = "🟢 *אישור הזמנה - סופר סמארט* 🟢\n👤 " + o.name + "\n📍 " + o.location + "\n\n*🛒 סל מוצרים:*\n" + o.waItems + "\n💰 *סה\"כ:* " + o.total;
             let waLink = "https://wa.me/972547607110?text=" + encodeURIComponent(msg);
 
