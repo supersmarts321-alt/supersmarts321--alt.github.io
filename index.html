@@ -231,7 +231,7 @@
         function showSuccess() {
             document.body.innerHTML = '';
             document.body.style.background = '#f0fdf4';
-            const o = JSON.parse(localStorage.getItem('last_order')) || { name: "לקוח", total: "0.00", waItems: "", location: "כללי" };
+            const o = JSON.parse(localStorage.getItem('last_order')) || { name: "לקוח", total: "0.00", waItems: "", location: "לא צוין" };
             let msg = "🟢 *אישור הזמנה - סופר סמארט* 🟢\n👤 " + o.name + "\n📍 " + o.location + "\n\n*🛒 סל מוצרים:*\n" + o.waItems + "\n💰 *סה\"כ:* " + o.total;
             let waLink = "https://wa.me/972547607110?text=" + encodeURIComponent(msg);
 
@@ -245,7 +245,7 @@
                             <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px;"><span>לקוח:</span><strong>${o.name}</strong></div>
                             <div style="display:flex; justify-content:space-between; font-size:18px;"><span>סה"כ:</span><strong style="color:#15803d;">${o.total}</strong></div>
                         </div>
-                        <a href="${waLink}" style="display:block; text-decoration:none; width:100%; background:#25d366; color:white; border:none; padding:18px; border-radius:15px; font-size:18px; font-weight:bold; cursor:pointer;">שלח אישור לוואטסאפ</a>
+                        <a href="${waLink}" target="_blank" style="display:block; text-decoration:none; width:100%; background:#25d366; color:white; border:none; padding:18px; border-radius:15px; font-size:18px; font-weight:bold; cursor:pointer;">שלח אישור לוואטסאפ</a>
                     </div>
                 </div>`;
             
