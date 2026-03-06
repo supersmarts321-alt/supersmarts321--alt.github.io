@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>סופר סמארט - קניה חכמה</title>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-NC8ZD4GC');</script>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סופר סמארט - קניות מהחווה</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -15,78 +15,81 @@
         .logo-img { height: 35px; object-fit: contain; }
         .nav-btn { color: white; padding: 8px 14px; border-radius: 99px; font-weight: bold; font-size: 0.8rem; }
         .nav-btn.active { background: white; color: var(--main-green); }
-        .filter-btn { padding: 10px 15px; border-radius: 12px; font-weight: bold; border: 2px solid #eee; background: white; flex: 1; font-size: 0.9rem; }
-        .filter-btn.active { border-color: var(--main-green); color: var(--main-green); }
-        .pulse-yellow { background-color: var(--accent-yellow) !important; color: black !important; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-        .cart-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 450px; z-index: 2100; display: none; }
-        .cart-preview { background: white; border: 1px solid #ddd; border-radius: 15px; padding: 12px; margin-bottom: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); font-size: 0.85rem; max-height: 180px; overflow-y: auto; border-right: 5px solid var(--main-green); }
-        .cart-inner { background: #064e3b; color: white; padding: 15px 25px; border-radius: 50px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 2px solid white; position: relative; }
-        .close-cart { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; border: 2px solid white; z-index: 2200; }
-        .card { background: white; border-radius: 15px; border: 1px solid #eee; display: flex; flex-direction: column; height: 100%; padding: 12px; position: relative; }
-        .badge { position: absolute; top: 8px; right: 8px; background: #ef4444; color: white; font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 700; }
-        .drawer { position: fixed; bottom: -100%; left: 0; right: 0; background: white; z-index: 3000; border-radius: 25px 25px 0 0; transition: 0.5s; max-height: 85vh; overflow-y: auto; padding: 20px; }
+        .card { background: white; border-radius: 20px; border: 1px solid #eee; display: flex; flex-direction: column; height: 100%; padding: 12px; transition: transform 0.2s; }
+        .card:active { transform: scale(0.96); }
+        .drawer { position: fixed; bottom: -100%; left: 0; right: 0; background: white; z-index: 3000; border-radius: 30px 30px 0 0; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); max-height: 85vh; overflow-y: auto; padding: 25px; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); }
         .drawer.open { bottom: 0; }
-        input, select, textarea { width: 100%; padding: 12px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; }
+        
+        #success-page { position: fixed; inset: 0; background: #f0fdf4; z-index: 9999; display: none; flex-direction: column; items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .receipt-card { background: white; width: 100%; max-width: 400px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); padding: 30px; position: relative; overflow: hidden; transform: translateY(20px); animation: slideUp 0.6s forwards; }
+        @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
+        .check-circle { width: 80px; height: 80px; background: #22c55e; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3); }
+        .wa-btn-pulse { background: #25d366; color: white; padding: 20px; border-radius: 18px; width: 100%; font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; animation: pulseGlow 2s infinite; text-decoration: none; }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
     </style>
 </head>
 <body>
-    <div class="deadline-bar">מכירה פתוחה - סגירה ביום שלישי 17:00</div>
-    <header id="main-header" class="fixed-header">
+    <div class="deadline-bar">⚠️ סגירת האתר להזמנות ביום שלישי בשעה 17:00!</div>
+    <header class="fixed-header">
         <div class="flex justify-center items-center gap-8 py-3 px-4 bg-white">
             <img src="https://i.postimg.cc/MHxRCpPM/badatz-png.jpg" class="logo-img">
             <img src="https://i.postimg.cc/8c9TmkC8/LOGO-JPG.jpg" class="logo-img">
         </div>
-        <nav class="bg-green-800 p-1.5 flex justify-center gap-1 overflow-x-auto whitespace-nowrap">
+        <nav class="bg-green-800 p-1.5 flex justify-center gap-2">
             <button onclick="tab('home')" id="btn-home" class="nav-btn active">בית</button>
-            <button onclick="tab('shop')" id="btn-shop" class="nav-btn">הקטלוג</button>
-            <button onclick="tab('how')" id="btn-how" class="nav-btn">איך זה עובד?</button>
-            <button onclick="tab('vision')" id="btn-vision" class="nav-btn">חזון</button>
+            <button onclick="tab('shop')" id="btn-shop" class="nav-btn">קטלוג</button>
             <button onclick="tab('policy')" id="btn-policy" class="nav-btn">מדיניות</button>
         </nav>
     </header>
 
-    <main id="main-content" class="container mx-auto px-4 pb-32">
-        <section id="home" class="tab-content block text-center py-8">
-            <h1 id="set-title" class="text-3xl font-black text-green-900 mb-2">טוען נתונים...</h1>
-            <p id="set-subtitle" class="text-gray-600 mb-8"></p>
-            <button onclick="tab('shop')" id="set-cta" class="bg-green-700 text-white px-10 py-4 rounded-full font-bold shadow-lg">לחנות</button>
+    <main class="container mx-auto px-4 pb-32">
+        <section id="home" class="tab-content block text-center py-10">
+            <h1 id="set-title" class="text-4xl font-black text-green-900 mb-3">סופר סמארט</h1>
+            <p id="set-subtitle" class="text-lg text-gray-600 mb-8">החווה אצלכם בבית</p>
+            <button onclick="tab('shop')" class="bg-green-700 text-white px-12 py-5 rounded-full font-black text-xl shadow-2xl transform active:scale-95 transition">בואו נתחיל בקניות ➔</button>
         </section>
         <section id="shop" class="tab-content hidden">
-            <div class="flex gap-2 mb-4">
-                <button onclick="filterShop(false)" id="sub-std" class="filter-btn active">רגיל</button>
-                <button onclick="filterShop(true)" id="sub-promo" class="filter-btn pulse-yellow">מבצעים</button>
-            </div>
-            <div id="promo-banner" class="hidden bg-yellow-100 border-2 border-dashed border-yellow-400 p-3 rounded-xl text-center font-bold text-yellow-800 mb-4"></div>
             <div id="product-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
         </section>
-        <section id="how" class="tab-content hidden p-6 bg-white rounded-xl shadow whitespace-pre-line"></section>
-        <section id="vision" class="tab-content hidden p-6 bg-white rounded-xl shadow whitespace-pre-line"></section>
-        <section id="policy" class="tab-content hidden p-6 bg-white rounded-xl shadow whitespace-pre-line"></section>
+        <section id="policy" class="tab-content hidden p-6 bg-white rounded-2xl shadow whitespace-pre-line text-right"></section>
     </main>
 
-    <div id="cart-container" class="cart-container">
-        <div onclick="hideCartBar()" class="close-cart">✕</div>
-        <div id="cart-preview" class="cart-preview"></div>
-        <div onclick="openDrawer(true)" class="cart-inner"><span id="total-price-bar" class="text-xl font-black">0.00 ₪</span><span class="font-bold">לתשלום ➔</span></div>
+    <div id="cart-container" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-11/12 max-w-md z-50 hidden">
+        <div onclick="openDrawer(true)" class="bg-green-900 text-white p-5 rounded-full flex justify-between items-center shadow-2xl border-2 border-white cursor-pointer">
+            <span id="total-price-bar" class="text-2xl font-black">0.00 ₪</span>
+            <span class="font-bold bg-white text-green-900 px-4 py-1 rounded-full">לסיכום 🛒</span>
+        </div>
     </div>
 
     <div id="drawer" class="drawer">
-        <div class="flex justify-between items-center mb-4"><h2 id="set-drawer-title" class="text-xl font-bold">הסל שלי</h2><button onclick="openDrawer(false)" class="text-2xl text-gray-400">✕</button></div>
-        <div id="drawer-items" class="mb-4 border-b pb-4"></div>
-        <div class="space-y-1">
-            <input type="text" id="cust-name" placeholder="שם מלא (חובה)">
-            <input type="tel" id="cust-phone" placeholder="טלפון (חובה)">
-            <input type="email" id="cust-email" placeholder="אימייל (מומלץ)">
-            <select id="cust-loc"><option value="">בחר נקודת איסוף (חובה)</option></select>
-            <input type="text" id="cust-address" placeholder="כתובת">
-            <textarea id="cust-notes" rows="3" placeholder="הערות למבצעים או לשליח..."></textarea>
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-black text-green-900">הסל שלי</h2>
+            <button onclick="openDrawer(false)" class="text-3xl text-gray-300">✕</button>
         </div>
-        <label class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg mt-3 cursor-pointer">
-            <input type="checkbox" id="policy-check" class="mt-1 w-5 h-5">
-            <span class="text-xs"><span id="set-policy-label">אני מאשר</span> | <span class="text-blue-600 underline" onclick="tab('policy'); openDrawer(false);">לעיון בתקנון</span></span>
-        </label>
-        <button onclick="pay()" id="set-pay-btn" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg mt-5">המשך לתשלום</button>
+        <div id="drawer-items" class="mb-6 space-y-3"></div>
+        <div class="space-y-3">
+            <input type="text" id="cust-name" placeholder="שם מלא (חובה)" class="w-full p-3 border rounded-xl text-lg">
+            <input type="tel" id="cust-phone" placeholder="מספר טלפון (חובה)" class="w-full p-3 border rounded-xl text-lg">
+            <select id="cust-loc" class="w-full p-3 border rounded-xl text-lg"><option value="">בחר נקודת איסוף (חובה)</option></select>
+            <textarea id="cust-notes" rows="2" placeholder="הערות אישיות (ערבובים, אריזה...)" class="w-full p-3 border rounded-xl text-lg"></textarea>
+        </div>
+        <button onclick="pay()" class="w-full bg-green-600 text-white py-5 rounded-2xl font-black text-xl mt-6 shadow-lg">המשך לתשלום מאובטח 💳</button>
+    </div>
+
+    <div id="success-page">
+        <div class="receipt-card">
+            <div class="check-circle">✓</div>
+            <h1 class="text-2xl font-black text-center text-gray-800 mb-1">התשלום בוצע!</h1>
+            <p class="text-center text-gray-500 mb-6 italic">איזה כיף, אנחנו כבר מתחילים לארוז...</p>
+            <div class="border-t border-b border-dashed py-4 mb-6">
+                <div class="flex justify-between mb-2"><span class="text-gray-400">לקוח:</span><span id="summ-name" class="font-bold"></span></div>
+                <div class="flex justify-between mb-2"><span class="text-gray-400">סטטוס:</span><span class="text-green-600 font-bold">שולם בהצלחה ✅</span></div>
+                <div class="flex justify-between mt-4 pt-4 border-t"><span class="text-lg font-bold">סה"כ לתשלום:</span><span id="summ-total" class="text-2xl font-black text-green-700"></span></div>
+            </div>
+            <p class="text-center text-sm text-gray-400 mb-4">חובה ללחוץ על הכפתור למטה כדי לשלוח לנו את רשימת המוצרים לוואטסאפ:</p>
+            <a id="whatsapp-btn" href="#" class="wa-btn-pulse">שלח פירוט בוואטסאפ ✅</a>
+        </div>
+        <p class="mt-8 text-green-900 font-bold">תודה שבחרת סופר סמארט!</p>
     </div>
 
     <script>
@@ -94,65 +97,39 @@
         let cart = JSON.parse(localStorage.getItem('supersmart_cart')) || {}, products = [], settings = {};
 
         async function init() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('Response') === '000' || urlParams.has('thankyou')) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('thankyou') || params.get('Response') === '000') {
                 return showSuccess();
             }
             try {
                 const res = await fetch(SCRIPT_URL + '?callback=process').then(r => r.text());
                 eval(res);
-            } catch(e) { console.error("Load Error"); }
+            } catch(e) { console.error("Load error"); }
         }
 
         function process(data) {
-            data.הגדרות.forEach(r => { if(r[0]) settings[r[0]] = r[1]; });
+            data.settings.forEach(r => { if(r[0]) settings[r[0]] = r[1]; });
             document.getElementById('set-title').innerText = settings.כותרת_ראשית || "סופר סמארט";
-            document.getElementById('set-subtitle').innerText = settings.תת_כותרת || "";
-            document.getElementById('set-cta').innerText = settings.כפתור_CTA || "לחנות";
-            document.getElementById('how').innerText = settings.טקסט_איך || "";
-            document.getElementById('vision').innerText = settings.טקסט_חזון || "";
             document.getElementById('policy').innerText = settings.טקסט_מדיניות || "";
-            document.getElementById('sub-std').innerText = settings.כותרת_קטגוריה_סטנדרט || "רגיל";
-            document.getElementById('sub-promo').innerText = settings.כותרת_קטגוריה_עלים || "מבצעים";
-            document.getElementById('set-drawer-title').innerText = settings.כותרת_מגירה || "הסל שלי";
-            document.getElementById('set-policy-label').innerText = settings.טקסט_אישור || "אני מאשר";
-            document.getElementById('set-pay-btn').innerText = settings.כפתור_תשלום || "המשך לתשלום";
-            
-            products = data.מוצרים.slice(1).map(r => ({
-                name: r[0], 
-                price: parseFloat(r[1])||0, 
-                unit: r[2] || "יח'", 
-                loc: r[3], 
-                img: r[5], 
-                sale: r[6], 
-                origin: r[7] || "", 
-                isLeaf: r[8] === "כן"
-            })).filter(p => p.name && p.price > 0);
-
+            products = data.products.slice(1).map(r => ({ name: r[0], price: parseFloat(r[1])||0, loc: r[3], img: r[5] })).filter(p => p.name && p.price > 0);
             const locs = [...new Set(products.map(p => p.loc).filter(Boolean))];
-            document.getElementById('cust-loc').innerHTML = '<option value="">בחר נקודת איסוף (חובה)</option>' + 
-                locs.map(l => `<option value="${l}">${l}</option>`).join('');
-            
-            updateUI(); filterShop(false);
+            document.getElementById('cust-loc').innerHTML = '<option value="">בחר נקודת איסוף (חובה)</option>' + locs.map(l => `<option value="${l}">${l}</option>`).join('');
+            render();
+            updateUI();
         }
 
-        function filterShop(leaf) {
-            document.getElementById('sub-std').classList.toggle('active', !leaf);
-            document.getElementById('sub-promo').classList.toggle('active', leaf);
-            const banner = document.getElementById('promo-banner');
-            banner.innerText = settings.הודעת_מבצע_עלים || "";
-            banner.style.display = leaf && settings.הודעת_מבצע_עלים ? 'block' : 'none';
-
+        function render() {
             const grid = document.getElementById('product-grid');
-            grid.innerHTML = products.filter(p => p.isLeaf === leaf).map(p => {
+            grid.innerHTML = products.map(p => {
                 const q = cart[p.name] || 0;
-                return `<div class="card">${p.sale ? `<div class="badge">${p.sale}</div>` : ''}
-                    <div class="h-24 flex items-center justify-center mb-2"><img src="${p.img}" class="max-h-full object-contain"></div>
-                    <h3 class="font-bold text-xs mb-0.5">${p.name}</h3>
-                    <div class="text-[10px] text-gray-500 mb-1">${p.origin}</div> <p class="text-green-700 font-bold text-sm">${p.price.toFixed(2)} ₪ <span class="text-[10px] text-gray-400 font-normal">/ ${p.unit}</span></p> <div class="flex items-center justify-between bg-gray-100 rounded-full p-1 mt-auto">
-                        <button onclick="update('${p.name}',-1)" class="w-8 h-8 bg-white rounded-full shadow text-lg">-</button>
-                        <span class="font-bold">${q}</span>
-                        <button onclick="update('${p.name}',1)" class="w-8 h-8 bg-white rounded-full shadow text-lg">+</button>
+                return `<div class="card">
+                    <img src="${p.img}" class="h-24 object-contain mb-2">
+                    <h3 class="font-bold text-xs text-gray-800">${p.name}</h3>
+                    <p class="text-green-700 font-black mb-2">${p.price.toFixed(2)} ₪</p>
+                    <div class="flex items-center justify-between bg-gray-100 rounded-full p-1 mt-auto">
+                        <button onclick="update('${p.name}',-1)" class="w-8 h-8 bg-white rounded-full shadow-sm font-bold">-</button>
+                        <span class="font-black text-green-900">${q}</span>
+                        <button onclick="update('${p.name}',1)" class="w-8 h-8 bg-white rounded-full shadow-sm font-bold">+</button>
                     </div></div>`;
             }).join('');
         }
@@ -161,96 +138,63 @@
             let q = (cart[n] || 0) + d;
             if (q <= 0) delete cart[n]; else cart[n] = q;
             localStorage.setItem('supersmart_cart', JSON.stringify(cart));
-            filterShop(document.getElementById('sub-promo').classList.contains('active'));
-            updateUI();
+            render(); updateUI();
         }
 
         function updateUI() {
-            let total = 0, previewHtml = '';
+            let total = 0, drawerHtml = '';
             for (let n in cart) {
                 const p = products.find(x => x.name === n);
-                if(p) {
-                    total += p.price * cart[n];
-                    previewHtml += `<div class="flex justify-between py-1 border-b text-xs"><span><b>${n}</b> x ${cart[n]}</span></div>`;
-                }
+                if(!p) continue;
+                const sub = p.price * cart[n];
+                total += sub;
+                drawerHtml += `<div class="flex justify-between items-center py-3 border-b border-gray-50">
+                    <span class="font-bold">${n}</span>
+                    <span class="text-sm text-gray-500">${cart[n]} יח' × ${p.price.toFixed(2)} = <b class="text-green-800">${sub.toFixed(2)} ₪</b></span>
+                </div>`;
             }
             document.getElementById('total-price-bar').innerText = total.toFixed(2) + ' ₪';
             document.getElementById('cart-container').style.display = total > 0 ? 'block' : 'none';
-            document.getElementById('cart-preview').innerHTML = previewHtml;
-            document.getElementById('drawer-items').innerHTML = previewHtml;
+            document.getElementById('drawer-items').innerHTML = drawerHtml;
         }
 
-        function hideCartBar() { document.getElementById('cart-container').style.display = 'none'; }
         function openDrawer(o) { document.getElementById('drawer').classList.toggle('open', o); }
         function tab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('btn-'+id).classList.add('active');
+            window.scrollTo(0,0);
+            ['home', 'shop', 'policy'].forEach(b => {
+                const el = document.getElementById('btn-' + b);
+                if(el) el.classList.toggle('active', b === id);
+            });
         }
 
         async function pay() {
-            const n = document.getElementById('cust-name').value, 
-                  p = document.getElementById('cust-phone').value, 
-                  e = document.getElementById('cust-email').value,
-                  l = document.getElementById('cust-loc').value;
-            if(!n || !p || !l || !document.getElementById('policy-check').checked) return alert('מלאו פרטים מלאים');
-
-            let itemSummary = [], waList = "";
-            for (let name in cart) {
-                itemSummary.push(name.trim() + " x " + cart[name]); 
-                waList += "• " + name.trim() + " x " + cart[name] + "\n";
-            }
-
-            const orderObj = { 
-                name: n, phone: p, email: e, location: l, 
-                address: document.getElementById('cust-address').value || "",
-                total: document.getElementById('total-price-bar').innerText, 
-                items: itemSummary.join(', '), waItems: waList, 
-                date: new Date().toLocaleDateString('he-IL'),
-                notes: document.getElementById('cust-notes').value || "" 
-            };
+            const n = document.getElementById('cust-name').value, p = document.getElementById('cust-phone').value, l = document.getElementById('cust-loc').value;
+            if(!n || !p || !l) return alert('נא למלא פרטי חובה');
+            const totalStr = document.getElementById('total-price-bar').innerText;
+            const itemsForSheet = Object.entries(cart).map(([name, q]) => `${name} x ${q}`).join(' | ');
+            const itemsForWA = Object.entries(cart).map(([name, q]) => `🥦 ${name} x ${q}`).join('\n');
+            const payload = { name: n, phone: p, location: l, total: totalStr, items: itemsForSheet, waItems: itemsForWA, notes: document.getElementById('cust-notes').value };
             
-            localStorage.setItem('last_order', JSON.stringify(orderObj));
-            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(orderObj) });
+            localStorage.setItem('last_order', JSON.stringify(payload));
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
             
-            const cleanSum = orderObj.total.replace(/[^\d.]/g, ''); 
-            const params = new URLSearchParams({
-                sum: cleanSum,
-                contact: n,
-                phone: p,
-                email: e || 'no@email.com',
-                original_return_method: 'GET',
-                success_url: window.location.origin + window.location.pathname + '?thankyou=1',
-                error_url: window.location.origin + window.location.pathname
-            });
-            
-            window.location.href = `https://direct.tranzila.com/fxpsupersmart/iframenew.php?${params.toString()}`;
+            const returnUrl = window.location.origin + window.location.pathname + '?thankyou=1';
+            window.location.href = `https://direct.tranzila.com/fxpsupersmart/iframenew.php?sum=${totalStr.replace(' ₪','')}&currency=1&contact=${encodeURIComponent(n)}&phone=${p}&success_url=${encodeURIComponent(returnUrl)}`;
         }
 
         function showSuccess() {
-            document.body.innerHTML = '';
-            document.body.style.background = '#f0fdf4';
-            const o = JSON.parse(localStorage.getItem('last_order')) || { name: "לקוח", total: "0.00", waItems: "", location: "לא צוין" };
-            let msg = "🟢 *אישור הזמנה - סופר סמארט* 🟢\n👤 " + o.name + "\n📍 " + o.location + "\n\n*🛒 סל מוצרים:*\n" + o.waItems + "\n💰 *סה\"כ:* " + o.total;
-            let waLink = "https://wa.me/972547607110?text=" + encodeURIComponent(msg);
-
-            document.body.innerHTML = `
-                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:20px; text-align:center; font-family:'Rubik', sans-serif;">
-                    <div style="background:white; border-radius:30px; padding:40px; box-shadow:0 10px 30px rgba(0,0,0,0.1); max-width:400px; width:100%;">
-                        <div style="width:70px; height:70px; background:#22c55e; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:40px; margin:0 auto 20px;">✓</div>
-                        <h1 style="font-size:24px; font-weight:900; color:#166534; margin-bottom:10px;">תודה רבה!</h1>
-                        <p style="color:#666; margin-bottom:20px;">ההזמנה התקבלה בהצלחה</p>
-                        <div style="background:#f8faf8; border-radius:15px; padding:15px; margin-bottom:25px; text-align:right;">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px;"><span>לקוח:</span><strong>${o.name}</strong></div>
-                            <div style="display:flex; justify-content:space-between; font-size:18px;"><span>סה"כ:</span><strong style="color:#15803d;">${o.total}</strong></div>
-                        </div>
-                        <a href="${waLink}" target="_blank" style="display:block; text-decoration:none; width:100%; background:#25d366; color:white; border:none; padding:18px; border-radius:15px; font-size:18px; font-weight:bold; cursor:pointer;">שלח אישור לוואטסאפ</a>
-                    </div>
-                </div>`;
-            
+            document.getElementById('success-page').style.display = 'flex';
+            const o = JSON.parse(localStorage.getItem('last_order'));
+            if (o) {
+                document.getElementById('summ-name').innerText = o.name;
+                document.getElementById('summ-total').innerText = o.total;
+                const m = `🌿 *הזמנה חדשה - סופר סמארט*\n✅ תשלום בוצע\n👤 שם: ${o.name}\n📍 איסוף: ${o.location}\n\n🛒 *פירוט:*\n${o.waItems}\n\n💰 *סה"כ:* ${o.total}\n📝 הערות: ${o.notes || "אין"}`;
+                document.getElementById('whatsapp-btn').href = `https://wa.me/972547607110?text=${encodeURIComponent(m)}`;
+            }
             localStorage.removeItem('supersmart_cart');
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#15803d', '#22c55e', '#facc15'] });
         }
         window.onload = init;
     </script>
