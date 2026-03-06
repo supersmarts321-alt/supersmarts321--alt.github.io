@@ -1,20 +1,261 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="he">
+<html lang="he" dir="rtl">
 <head>
-    <meta charset="utf-8">
-    <title>תודה על התשלום – סופר סמארט</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סופר סמארט - קניה חכמה</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        body {font-family: Arial; text-align: center; padding: 60px; background: #f8fff8;}
-        h1 {color: #2e8b57; font-size: 36px;}
-        p {font-size: 24px;}
-        a {background: #25D366; color: white; padding: 20px 50px; text-decoration: none; border-radius: 15px; font-size: 26px;}
+        :root { --main-green: #15803d; --soft-bg: #f8faf8; --accent-yellow: #facc15; --alert-red: #dc2626; }
+        body { font-family: 'Rubik', sans-serif; background: var(--soft-bg); padding-top: 200px; margin: 0; }
+        .deadline-bar { position: fixed; top: 0; left: 0; right: 0; background: var(--alert-red); color: white; text-align: center; padding: 6px; font-weight: 700; z-index: 2500; font-size: 0.85rem; }
+        .fixed-header { position: fixed; top: 32px; left: 0; right: 0; z-index: 1000; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo-img { height: 35px; object-fit: contain; }
+        .nav-btn { color: white; padding: 8px 14px; border-radius: 99px; font-weight: bold; font-size: 0.8rem; }
+        .nav-btn.active { background: white; color: var(--main-green); }
+        .filter-btn { padding: 10px 15px; border-radius: 12px; font-weight: bold; border: 2px solid #eee; background: white; flex: 1; font-size: 0.9rem; }
+        .filter-btn.active { border-color: var(--main-green); color: var(--main-green); }
+        .pulse-yellow { background-color: var(--accent-yellow) !important; color: black !important; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+        .cart-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 450px; z-index: 2100; display: none; }
+        .cart-preview { background: white; border: 1px solid #ddd; border-radius: 15px; padding: 12px; margin-bottom: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); font-size: 0.85rem; max-height: 180px; overflow-y: auto; border-right: 5px solid var(--main-green); }
+        .cart-inner { background: #064e3b; color: white; padding: 15px 25px; border-radius: 50px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 2px solid white; position: relative; }
+        .close-cart { position: absolute; top: -10px; right: -10px; background: #ef4444; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; border: 2px solid white; z-index: 2200; }
+        .card { background: white; border-radius: 15px; border: 1px solid #eee; display: flex; flex-direction: column; height: 100%; padding: 12px; position: relative; }
+        .badge { position: absolute; top: 8px; right: 8px; background: #ef4444; color: white; font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+        .drawer { position: fixed; bottom: -100%; left: 0; right: 0; background: white; z-index: 3000; border-radius: 25px 25px 0 0; transition: 0.5s; max-height: 85vh; overflow-y: auto; padding: 20px; }
+        .drawer.open { bottom: 0; }
+        input, select, textarea { width: 100%; padding: 12px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <h1>✓ התשלום התקבל בהצלחה!</h1>
-    <p>תודה רבה!</p>
-    <p>עסקה: <b>{TransactionId}</b> | סכום: <b>{Amount} ₪</b></p>
-    <br><br>
-    <a href="whatsapp://send?phone=972547607110&text=היי! סיימתי לשלם עסקה {TransactionId} סכום {Amount}₪ אפשר להמשיך?">חזרה לוואטסאפ 💬</a>
+    <div class="deadline-bar">מכירה פתוחה - סגירה ביום שלישי 17:00</div>
+    <header id="main-header" class="fixed-header">
+        <div class="flex justify-center items-center gap-8 py-3 px-4 bg-white">
+            <img src="https://i.postimg.cc/MHxRCpPM/badatz-png.jpg" class="logo-img">
+            <img src="https://i.postimg.cc/8c9TmkC8/LOGO-JPG.jpg" class="logo-img">
+        </div>
+        <nav class="bg-green-800 p-1.5 flex justify-center gap-1 overflow-x-auto whitespace-nowrap">
+            <button onclick="tab('home')" id="btn-home" class="nav-btn active">בית</button>
+            <button onclick="tab('shop')" id="btn-shop" class="nav-btn">הקטלוג</button>
+            <button onclick="tab('how')" id="btn-how" class="nav-btn">איך זה עובד?</button>
+            <button onclick="tab('vision')" id="btn-vision" class="nav-btn">חזון</button>
+            <button onclick="tab('policy')" id="btn-policy" class="nav-btn">מדיניות</button>
+        </nav>
+    </header>
+
+    <main id="main-content" class="container mx-auto px-4 pb-32">
+        <section id="home" class="tab-content block text-center py-8">
+            <h1 id="set-title" class="text-3xl font-black text-green-900 mb-2">טוען נתונים...</h1>
+            <p id="set-subtitle" class="text-gray-600 mb-8"></p>
+            <button onclick="tab('shop')" id="set-cta" class="bg-green-700 text-white px-10 py-4 rounded-full font-bold shadow-lg">לחנות</button>
+        </section>
+        <section id="shop" class="tab-content hidden">
+            <div class="flex gap-2 mb-4">
+                <button onclick="filterShop(false)" id="sub-std" class="filter-btn active">רגיל</button>
+                <button onclick="filterShop(true)" id="sub-promo" class="filter-btn pulse-yellow">מבצעים</button>
+            </div>
+            <div id="promo-banner" class="hidden bg-yellow-100 border-2 border-dashed border-yellow-400 p-3 rounded-xl text-center font-bold text-yellow-800 mb-4"></div>
+            <div id="product-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        </section>
+        <section id="how" class="tab-content hidden p-6 bg-white rounded-xl shadow whitespace-pre-line"></section>
+        <section id="vision" class="tab-content hidden p-6 bg-white rounded-xl shadow whitespace-pre-line"></section>
+        <section id="policy" class="tab-content hidden p-6 bg-white rounded-xl shadow whitespace-pre-line"></section>
+    </main>
+
+    <div id="cart-container" class="cart-container">
+        <div onclick="hideCartBar()" class="close-cart">✕</div>
+        <div id="cart-preview" class="cart-preview"></div>
+        <div onclick="openDrawer(true)" class="cart-inner"><span id="total-price-bar" class="text-xl font-black">0.00 ₪</span><span class="font-bold">לתשלום ➔</span></div>
+    </div>
+
+    <div id="drawer" class="drawer">
+        <div class="flex justify-between items-center mb-4"><h2 id="set-drawer-title" class="text-xl font-bold">הסל שלי</h2><button onclick="openDrawer(false)" class="text-2xl text-gray-400">✕</button></div>
+        <div id="drawer-items" class="mb-4 border-b pb-4"></div>
+        <div class="space-y-1">
+            <input type="text" id="cust-name" placeholder="שם מלא (חובה)">
+            <input type="tel" id="cust-phone" placeholder="טלפון (חובה)">
+            <input type="email" id="cust-email" placeholder="אימייל (מומלץ)">
+            <select id="cust-loc"><option value="">בחר נקודת איסוף (חובה)</option></select>
+            <input type="text" id="cust-address" placeholder="כתובת">
+            <textarea id="cust-notes" rows="3" placeholder="הערות למבצעים או לשליח..."></textarea>
+        </div>
+        <label class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg mt-3 cursor-pointer">
+            <input type="checkbox" id="policy-check" class="mt-1 w-5 h-5">
+            <span class="text-xs"><span id="set-policy-label">אני מאשר</span> | <span class="text-blue-600 underline" onclick="tab('policy'); openDrawer(false);">לעיון בתקנון</span></span>
+        </label>
+        <button onclick="pay()" id="set-pay-btn" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg mt-5">המשך לתשלום</button>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyx3v3SbaJCXHN-FfkcvDVDrmgLXOzj8EjVZP0XqbjbXtmZFayeNqEqXdoH6VQj8FlvWQ/exec'; 
+        let cart = JSON.parse(localStorage.getItem('supersmart_cart')) || {}, products = [], settings = {};
+
+        async function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('Response') === '000' || urlParams.has('thankyou')) {
+                return showSuccess();
+            }
+            try {
+                const res = await fetch(SCRIPT_URL + '?callback=process').then(r => r.text());
+                eval(res);
+            } catch(e) { console.error("Load Error"); }
+        }
+
+        function process(data) {
+            data.הגדרות.forEach(r => { if(r[0]) settings[r[0]] = r[1]; });
+            document.getElementById('set-title').innerText = settings.כותרת_ראשית || "סופר סמארט";
+            document.getElementById('set-subtitle').innerText = settings.תת_כותרת || "";
+            document.getElementById('set-cta').innerText = settings.כפתור_CTA || "לחנות";
+            document.getElementById('how').innerText = settings.טקסט_איך || "";
+            document.getElementById('vision').innerText = settings.טקסט_חזון || "";
+            document.getElementById('policy').innerText = settings.טקסט_מדיניות || "";
+            document.getElementById('sub-std').innerText = settings.כותרת_קטגוריה_סטנדרט || "רגיל";
+            document.getElementById('sub-promo').innerText = settings.כותרת_קטגוריה_עלים || "מבצעים";
+            document.getElementById('set-drawer-title').innerText = settings.כותרת_מגירה || "הסל שלי";
+            document.getElementById('set-policy-label').innerText = settings.טקסט_אישור || "אני מאשר";
+            document.getElementById('set-pay-btn').innerText = settings.כפתור_תשלום || "המשך לתשלום";
+            
+            products = data.מוצרים.slice(1).map(r => ({
+                name: r[0], 
+                price: parseFloat(r[1])||0, 
+                unit: r[2] || "יח'", 
+                loc: r[3], 
+                img: r[5], 
+                sale: r[6], 
+                origin: r[7] || "", 
+                isLeaf: r[8] === "כן"
+            })).filter(p => p.name && p.price > 0);
+
+            const locs = [...new Set(products.map(p => p.loc).filter(Boolean))];
+            document.getElementById('cust-loc').innerHTML = '<option value="">בחר נקודת איסוף (חובה)</option>' + 
+                locs.map(l => `<option value="${l}">${l}</option>`).join('');
+            
+            updateUI(); filterShop(false);
+        }
+
+        function filterShop(leaf) {
+            document.getElementById('sub-std').classList.toggle('active', !leaf);
+            document.getElementById('sub-promo').classList.toggle('active', leaf);
+            const banner = document.getElementById('promo-banner');
+            banner.innerText = settings.הודעת_מבצע_עלים || "";
+            banner.style.display = leaf && settings.הודעת_מבצע_עלים ? 'block' : 'none';
+
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = products.filter(p => p.isLeaf === leaf).map(p => {
+                const q = cart[p.name] || 0;
+                return `<div class="card">${p.sale ? `<div class="badge">${p.sale}</div>` : ''}
+                    <div class="h-24 flex items-center justify-center mb-2"><img src="${p.img}" class="max-h-full object-contain"></div>
+                    <h3 class="font-bold text-xs mb-0.5">${p.name}</h3>
+                    <div class="text-[10px] text-gray-500 mb-1">${p.origin}</div> <p class="text-green-700 font-bold text-sm">${p.price.toFixed(2)} ₪ <span class="text-[10px] text-gray-400 font-normal">/ ${p.unit}</span></p> <div class="flex items-center justify-between bg-gray-100 rounded-full p-1 mt-auto">
+                        <button onclick="update('${p.name}',-1)" class="w-8 h-8 bg-white rounded-full shadow text-lg">-</button>
+                        <span class="font-bold">${q}</span>
+                        <button onclick="update('${p.name}',1)" class="w-8 h-8 bg-white rounded-full shadow text-lg">+</button>
+                    </div></div>`;
+            }).join('');
+        }
+
+        function update(n, d) {
+            let q = (cart[n] || 0) + d;
+            if (q <= 0) delete cart[n]; else cart[n] = q;
+            localStorage.setItem('supersmart_cart', JSON.stringify(cart));
+            filterShop(document.getElementById('sub-promo').classList.contains('active'));
+            updateUI();
+        }
+
+        function updateUI() {
+            let total = 0, previewHtml = '';
+            for (let n in cart) {
+                const p = products.find(x => x.name === n);
+                if(p) {
+                    total += p.price * cart[n];
+                    previewHtml += `<div class="flex justify-between py-1 border-b text-xs"><span><b>${n}</b> x ${cart[n]}</span></div>`;
+                }
+            }
+            document.getElementById('total-price-bar').innerText = total.toFixed(2) + ' ₪';
+            document.getElementById('cart-container').style.display = total > 0 ? 'block' : 'none';
+            document.getElementById('cart-preview').innerHTML = previewHtml;
+            document.getElementById('drawer-items').innerHTML = previewHtml;
+        }
+
+        function hideCartBar() { document.getElementById('cart-container').style.display = 'none'; }
+        function openDrawer(o) { document.getElementById('drawer').classList.toggle('open', o); }
+        function tab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-'+id).classList.add('active');
+        }
+
+        async function pay() {
+            const n = document.getElementById('cust-name').value, 
+                  p = document.getElementById('cust-phone').value, 
+                  e = document.getElementById('cust-email').value,
+                  l = document.getElementById('cust-loc').value;
+            if(!n || !p || !l || !document.getElementById('policy-check').checked) return alert('מלאו פרטים מלאים');
+
+            let itemSummary = [], waList = "";
+            for (let name in cart) {
+                itemSummary.push(name.trim() + " x " + cart[name]); 
+                waList += "• " + name.trim() + " x " + cart[name] + "\n";
+            }
+
+            const orderObj = { 
+                name: n, phone: p, email: e, location: l, 
+                address: document.getElementById('cust-address').value || "",
+                total: document.getElementById('total-price-bar').innerText, 
+                items: itemSummary.join(', '), waItems: waList, 
+                date: new Date().toLocaleDateString('he-IL'),
+                notes: document.getElementById('cust-notes').value || "" 
+            };
+            
+            localStorage.setItem('last_order', JSON.stringify(orderObj));
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(orderObj) });
+            
+            const cleanSum = orderObj.total.replace(/[^\d.]/g, ''); 
+            const params = new URLSearchParams({
+                sum: cleanSum,
+                contact: n,
+                phone: p,
+                email: e || 'no@email.com',
+                lang: 'il', // תיקון ל-il עבור טרנזילה
+                original_return_method: 'GET',
+                success_url: window.location.origin + window.location.pathname + '?thankyou=1',
+                error_url: window.location.origin + window.location.pathname
+            });
+            
+            window.location.href = `https://direct.tranzila.com/fxpsupersmart/iframenew.php?${params.toString()}`;
+        }
+
+        function showSuccess() {
+            document.body.innerHTML = '';
+            document.body.style.background = '#f0fdf4';
+            const o = JSON.parse(localStorage.getItem('last_order')) || { name: "לקוח", total: "0.00", waItems: "" };
+            
+            document.body.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:20px; text-align:center; font-family:'Rubik', sans-serif;">
+                    <div style="background:white; border-radius:30px; padding:40px; box-shadow:0 10px 30px rgba(0,0,0,0.1); max-width:400px; width:100%;">
+                        <div style="width:70px; height:70px; background:#22c55e; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:40px; margin:0 auto 20px;">✓</div>
+                        <h1 style="font-size:24px; font-weight:900; color:#166534; margin-bottom:10px;">תודה רבה!</h1>
+                        <p style="color:#666; margin-bottom:20px;">ההזמנה התקבלה בהצלחה</p>
+                        <div style="background:#f8faf8; border-radius:15px; padding:15px; margin-bottom:25px; text-align:right;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px;"><span>לקוח:</span><strong>${o.name}</strong></div>
+                            <div style="display:flex; justify-content:space-between; font-size:18px;"><span>סה"כ:</span><strong style="color:#15803d;">${o.total}</strong></div>
+                        </div>
+                        <button id="wa-final" style="width:100%; background:#25d366; color:white; border:none; padding:18px; border-radius:15px; font-size:18px; font-weight:bold; cursor:pointer;">שלח אישור לוואטסאפ</button>
+                    </div>
+                </div>`;
+            
+            localStorage.removeItem('supersmart_cart');
+            document.getElementById('wa-final').onclick = () => {
+                let msg = "🟢 *אישור הזמנה - סופר סמארט* 🟢\n👤 " + o.name + "\n📍 " + o.location + "\n\n*🛒 סל מוצרים:*\n" + o.waItems + "\n💰 *סה\"כ:* " + o.total;
+                window.location.href = "https://wa.me/972547607110?text=" + encodeURIComponent(msg);
+            };
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        }
+        window.onload = init;
+    </script>
 </body>
 </html>
