@@ -25,7 +25,6 @@
         @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
         .check-circle { width: 80px; height: 80px; background: #22c55e; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3); }
         .wa-btn-pulse { background: #25d366; color: white; padding: 20px; border-radius: 18px; width: 100%; font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; animation: pulseGlow 2s infinite; text-decoration: none; }
-        @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
     </style>
 </head>
 <body>
@@ -86,10 +85,8 @@
                 <div class="flex justify-between mb-2"><span class="text-gray-400">סטטוס:</span><span class="text-green-600 font-bold">שולם בהצלחה ✅</span></div>
                 <div class="flex justify-between mt-4 pt-4 border-t"><span class="text-lg font-bold">סה"כ לתשלום:</span><span id="summ-total" class="text-2xl font-black text-green-700"></span></div>
             </div>
-            <p class="text-center text-sm text-gray-400 mb-4">חובה ללחוץ על הכפתור למטה כדי לשלוח לנו את רשימת המוצרים לוואטסאפ:</p>
             <a id="whatsapp-btn" href="#" class="wa-btn-pulse">שלח פירוט בוואטסאפ ✅</a>
         </div>
-        <p class="mt-8 text-green-900 font-bold">תודה שבחרת סופר סמארט!</p>
     </div>
 
     <script>
@@ -98,13 +95,8 @@
 
         async function init() {
             const params = new URLSearchParams(window.location.search);
-            if (params.has('thankyou') || params.get('Response') === '000') {
-                return showSuccess();
-            }
-            try {
-                const res = await fetch(SCRIPT_URL + '?callback=process').then(r => r.text());
-                eval(res);
-            } catch(e) { console.error("Load error"); }
+            if (params.has('thankyou') || params.get('Response') === '000') { return showSuccess(); }
+            try { const res = await fetch(SCRIPT_URL + '?callback=process').then(r => r.text()); eval(res); } catch(e) {}
         }
 
         function process(data) {
@@ -114,8 +106,7 @@
             products = data.products.slice(1).map(r => ({ name: r[0], price: parseFloat(r[1])||0, loc: r[3], img: r[5] })).filter(p => p.name && p.price > 0);
             const locs = [...new Set(products.map(p => p.loc).filter(Boolean))];
             document.getElementById('cust-loc').innerHTML = '<option value="">בחר נקודת איסוף (חובה)</option>' + locs.map(l => `<option value="${l}">${l}</option>`).join('');
-            render();
-            updateUI();
+            render(); updateUI();
         }
 
         function render() {
@@ -148,10 +139,7 @@
                 if(!p) continue;
                 const sub = p.price * cart[n];
                 total += sub;
-                drawerHtml += `<div class="flex justify-between items-center py-3 border-b border-gray-50">
-                    <span class="font-bold">${n}</span>
-                    <span class="text-sm text-gray-500">${cart[n]} יח' × ${p.price.toFixed(2)} = <b class="text-green-800">${sub.toFixed(2)} ₪</b></span>
-                </div>`;
+                drawerHtml += `<div class="flex justify-between items-center py-3 border-b border-gray-50"><span class="font-bold">${n}</span><span class="text-sm text-gray-500">${cart[n]} יח' = <b class="text-green-800">${sub.toFixed(2)} ₪</b></span></div>`;
             }
             document.getElementById('total-price-bar').innerText = total.toFixed(2) + ' ₪';
             document.getElementById('cart-container').style.display = total > 0 ? 'block' : 'none';
@@ -162,31 +150,21 @@
         function tab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
-            window.scrollTo(0,0);
-            ['home', 'shop', 'policy'].forEach(b => {
-                const el = document.getElementById('btn-' + b);
-                if(el) el.classList.toggle('active', b === id);
-            });
+            ['home', 'shop', 'policy'].forEach(b => { if(document.getElementById('btn-'+b)) document.getElementById('btn-'+b).classList.toggle('active', b === id); });
         }
 
         async function pay() {
             const n = document.getElementById('cust-name').value, p = document.getElementById('cust-phone').value, l = document.getElementById('cust-loc').value;
             if(!n || !p || !l) return alert('נא למלא פרטי חובה');
-            const totalStr = document.getElementById('total-price-bar').innerText;
-            const itemsForSheet = Object.entries(cart).map(([name, q]) => `${name} x ${q}`).join(' | ');
-            const itemsForWA = Object.entries(cart).map(([name, q]) => `🥦 ${name} x ${q}`).join('\n');
-            const payload = { name: n, phone: p, location: l, total: totalStr, items: itemsForSheet, waItems: itemsForWA, notes: document.getElementById('cust-notes').value };
-            
+            const total = document.getElementById('total-price-bar').innerText.replace(' ₪','');
+            const waItems = Object.entries(cart).map(([name, q]) => `🥦 ${name} x ${q}`).join('\n');
+            const payload = { name: n, phone: p, location: l, total: total + " ₪", items: waItems, notes: document.getElementById('cust-notes').value };
             localStorage.setItem('last_order', JSON.stringify(payload));
             fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
             
-            const returnUrl = window.location.origin + window.location.pathname + '?thankyou=1';
-            
-            // תיקון סופי - משתמשים בפרמטר Hebrew ובקישור הפשוט ביותר
-            const tranzilaUrl = "https://direct.tranzila.com/fxpsupersmart/iframenew.php";
-            const amount = totalStr.replace(' ₪', '');
-            
-            window.location.href = `${tranzilaUrl}?sum=${amount}&currency=1&contact=${encodeURIComponent(n)}&phone=${p}&language=Hebrew&success_url=${encodeURIComponent(returnUrl)}`;
+            // הפתרון הסופי - שימוש בקישור הראשי של טרנזילה בלי קידומת השפה הבעייתית
+            const returnUrl = window.location.origin + window.location.pathname + "?thankyou=1";
+            window.location.href = `https://direct.tranzila.com/fxpsupersmart/?sum=${total}&currency=1&cred_type=1&contact=${encodeURIComponent(n)}&phone=${p}&success_url=${encodeURIComponent(returnUrl)}`;
         }
 
         function showSuccess() {
@@ -195,11 +173,11 @@
             if (o) {
                 document.getElementById('summ-name').innerText = o.name;
                 document.getElementById('summ-total').innerText = o.total;
-                const m = `🌿 *הזמנה חדשה - סופר סמארט*\n✅ תשלום בוצע\n👤 שם: ${o.name}\n📍 איסוף: ${o.location}\n\n🛒 *פירוט:*\n${o.waItems}\n\n💰 *סה"כ:* ${o.total}\n📝 הערות: ${o.notes || "אין"}`;
+                const m = `🌿 *הזמנה חדשה*\n👤 שם: ${o.name}\n📍 איסוף: ${o.location}\n\n🛒 *פירוט:*\n${o.items}\n\n💰 *סה"כ:* ${o.total}\n📝 הערות: ${o.notes || "אין"}`;
                 document.getElementById('whatsapp-btn').href = `https://wa.me/972547607110?text=${encodeURIComponent(m)}`;
             }
             localStorage.removeItem('supersmart_cart');
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#15803d', '#22c55e', '#facc15'] });
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         }
         window.onload = init;
     </script>
