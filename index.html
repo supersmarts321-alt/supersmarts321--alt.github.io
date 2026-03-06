@@ -220,7 +220,7 @@
                 contact: n,
                 phone: p,
                 email: e || 'no@email.com',
-                lang: 'il', // תיקון ל-il עבור טרנזילה
+                lang: 'il', 
                 original_return_method: 'GET',
                 success_url: window.location.origin + window.location.pathname + '?thankyou=1',
                 error_url: window.location.origin + window.location.pathname
@@ -232,8 +232,11 @@
         function showSuccess() {
             document.body.innerHTML = '';
             document.body.style.background = '#f0fdf4';
-            const o = JSON.parse(localStorage.getItem('last_order')) || { name: "לקוח", total: "0.00", waItems: "" };
             
+            const o = JSON.parse(localStorage.getItem('last_order')) || { name: "לקוח", total: "0.00", waItems: "", location: "לא נבחר" };
+            let msg = "🟢 *אישור הזמנה - סופר סמארט* 🟢\n👤 " + o.name + "\n📍 " + o.location + "\n\n*🛒 סל מוצרים:*\n" + o.waItems + "\n💰 *סה\"כ:* " + o.total;
+            let waLink = "https://wa.me/972547607110?text=" + encodeURIComponent(msg);
+
             document.body.innerHTML = `
                 <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:20px; text-align:center; font-family:'Rubik', sans-serif;">
                     <div style="background:white; border-radius:30px; padding:40px; box-shadow:0 10px 30px rgba(0,0,0,0.1); max-width:400px; width:100%;">
@@ -244,15 +247,11 @@
                             <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px;"><span>לקוח:</span><strong>${o.name}</strong></div>
                             <div style="display:flex; justify-content:space-between; font-size:18px;"><span>סה"כ:</span><strong style="color:#15803d;">${o.total}</strong></div>
                         </div>
-                        <button id="wa-final" style="width:100%; background:#25d366; color:white; border:none; padding:18px; border-radius:15px; font-size:18px; font-weight:bold; cursor:pointer;">שלח אישור לוואטסאפ</button>
+                        <a href="${waLink}" style="display:block; text-decoration:none; width:100%; background:#25d366; color:white; border:none; padding:18px; border-radius:15px; font-size:18px; font-weight:bold; cursor:pointer;">שלח אישור לוואטסאפ</a>
                     </div>
                 </div>`;
             
             localStorage.removeItem('supersmart_cart');
-            document.getElementById('wa-final').onclick = () => {
-                let msg = "🟢 *אישור הזמנה - סופר סמארט* 🟢\n👤 " + o.name + "\n📍 " + o.location + "\n\n*🛒 סל מוצרים:*\n" + o.waItems + "\n💰 *סה\"כ:* " + o.total;
-                window.location.href = "https://wa.me/972547607110?text=" + encodeURIComponent(msg);
-            };
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         }
         window.onload = init;
