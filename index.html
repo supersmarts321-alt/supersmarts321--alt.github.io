@@ -1,148 +1,323 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>סופר סמארט</title>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NC8ZD4GC');</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סופר סמארט - מהשדה לקהילה</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Rubik', sans-serif; background: #f8faf8; padding-top: 160px; }
-        .fixed-header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .card { background: white; border-radius: 20px; padding: 12px; border: 1px solid #eee; display: flex; flex-direction: column; }
-        .drawer { position: fixed; bottom: -100%; left: 0; right: 0; background: white; z-index: 3000; border-radius: 30px 30px 0 0; transition: 0.4s; max-height: 80vh; overflow-y: auto; padding: 20px; box-shadow: 0 -10px 40px rgba(0,0,0,0.1); }
-        .drawer.open { bottom: 0; }
-        #success-page { position: fixed; inset: 0; background: white; z-index: 9999; display: none; flex-direction: column; items: center; justify-content: center; padding: 20px; text-align: center; }
+        :root { --main-green: #15803d; --bg-soft: #f1f5f1; --gold: #f59e0b; }
+        body { font-family: 'Rubik', sans-serif; background: var(--bg-soft); padding-top: 140px; margin: 0; min-height: 100vh; }
+        .fixed-header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-logos { display: flex; align-items: center; justify-content: center; gap: 2rem; padding: 10px; border-bottom: 3px solid var(--main-green); }
+        .logo-badatz, .logo-main { height: 45px; width: auto; }
+        .nav-container { background: var(--main-green); padding: 8px 0; }
+        .nav-button { color: rgba(255,255,255,0.7); font-weight: bold; padding: 10px 16px; border-radius: 99px; cursor: pointer; white-space: nowrap; }
+        .nav-button.active { background: white; color: var(--main-green); }
+        .tab-content { display: none; padding: 16px; }
+        .tab-content.active { display: block; }
+        .product-card { border-radius: 16px; background: white; overflow: hidden; border-top: 4px solid var(--main-green); box-shadow: 0 3px 8px rgba(0,0,0,0.06); transition: 0.2s; position: relative; }
+        .vip-card { border: 2px solid var(--gold); transform: scale(1.02); z-index: 10; }
+        .vip-badge { position: absolute; top: 5px; right: 5px; background: var(--gold); color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
+        .half-btn { background: #e2e8f0; color: #475569; font-size: 0.75rem; padding: 2px 8px; border-radius: 6px; margin-top: 4px; font-weight: bold; width: 100%; }
+        .half-btn.active { background: var(--main-green); color: white; }
+        #orderDrawer { position: fixed; bottom: -100%; left: 0; right: 0; background: white; z-index: 3000; border-radius: 24px 24px 0 0; transition: 0.4s ease; max-height: 92vh; overflow-y: auto; padding: 24px 18px; box-shadow: 0 -10px 25px rgba(0,0,0,0.2); }
+        #orderDrawer.open { bottom: 0; }
+        .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 2500; display: none; }
+        .drawer-overlay.active { display: block; }
+        #cartWrapper { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 92%; max-width: 420px; display: none; }
+        #floatingCart { background: #064e3b; color: white; padding: 12px 18px; border-radius: 999px; display: flex; align-items: center; justify-content: space-between; border: 2px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        #thanks-screen { position: fixed; inset: 0; background: white; z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+        .loading-spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--main-green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 40px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <header class="fixed-header">
-        <div class="flex justify-center items-center gap-6 py-4 bg-white">
-            <img src="https://i.postimg.cc/MHxRCpPM/badatz-png.jpg" style="height:40px">
-            <img src="https://i.postimg.cc/8c9TmkC8/LOGO-JPG.jpg" style="height:40px">
-        </div>
-        <nav class="bg-green-800 p-2 flex justify-center gap-4 text-white font-bold">
-            <button onclick="tab('shop')">חנות</button>
-            <button onclick="tab('policy')">מדיניות</button>
-        </nav>
-    </header>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NC8ZD4GC" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    
+    <div id="thanks-screen">
+        <div class="text-7xl mb-4">🌿</div>
+        <h1 class="text-4xl font-black text-green-800 mb-2">התשלום עבר בהצלחה!</h1>
+        <p class="text-xl mb-8 px-6">תודה שבחרתם סופר סמארט עמישב.<br>ההזמנה שלכם בטיפול.</p>
+        <a id="wa-thanks-link" href="#" class="bg-green-600 text-white px-10 py-5 rounded-full font-black text-xl shadow-xl text-center">
+            שלחו לי אישור בוואטסאפ 📱
+        </a>
+        <button onclick="location.href=location.pathname" class="mt-8 text-gray-500 underline">חזרה לחנות</button>
+    </div>
 
-    <main class="container mx-auto px-4 pb-24">
-        <div id="shop" class="tab-content grid grid-cols-2 gap-4"></div>
-        <div id="policy" class="tab-content hidden p-6 bg-white rounded-xl shadow mt-4 text-right"></div>
+    <div id="closed-screen" style="display:none" class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-6 text-center">
+        <div class="bg-white p-10 rounded-3xl max-w-md">
+            <h1 class="text-3xl font-black text-red-600 mb-4">ההזמנות סגורות כרגע</h1>
+            <p id="closedMessage" class="text-lg mb-6"></p>
+            <a href="https://wa.me/972547607110" class="bg-green-600 text-white px-8 py-3 rounded-full font-bold">דברו איתנו בוואטסאפ</a>
+        </div>
+    </div>
+
+    <div class="fixed-header">
+        <header class="header-logos">
+            <img src="https://i.postimg.cc/MHxRCpPM/badatz-png.jpg" class="logo-badatz">
+            <img src="https://i.postimg.cc/8c9TmkC8/LOGO-JPG.jpg" class="logo-main">
+        </header>
+        <nav class="nav-container">
+            <div class="flex justify-start md:justify-center gap-2 overflow-x-auto px-4">
+                <button onclick="showTab('home')" id="btn-home" class="nav-button active">בית</button>
+                <button onclick="showTab('shop')" id="btn-shop" class="nav-button">הקטלוג</button>
+                <button onclick="showTab('how')" id="btn-how" class="nav-button">איך זה עובד?</button>
+                <button onclick="showTab('vision')" id="btn-vision" class="nav-button">חזון</button>
+                <button onclick="showTab('policy')" id="btn-policy" class="nav-button">מדיניות</button>
+            </div>
+        </nav>
+    </div>
+
+    <main class="container mx-auto max-w-5xl px-4 mt-4 text-right">
+        <section id="home" class="tab-content active">
+            <div class="bg-green-700 text-white p-10 rounded-3xl text-center shadow-xl">
+                <h1 class="text-5xl font-black mb-4">סופר סמארט עמישב</h1>
+                <p class="text-xl opacity-90 mb-8">מהשדה ישירות אליכם – טרי, כשר והוגן</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-800">
+                    <div class="bg-white p-6 rounded-2xl">
+                        <div class="text-4xl mb-2">🥬</div>
+                        <h3 class="font-bold text-lg">טריות ללא פשרות</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl">
+                        <div class="text-4xl mb-2">✡️</div>
+                        <h3 class="font-bold text-lg">כשרות מהודרת</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl">
+                        <div class="text-4xl mb-2">💰</div>
+                        <h3 class="font-bold text-lg">מחירים הוגנים</h3>
+                    </div>
+                </div>
+                <button onclick="showTab('shop')" class="mt-10 bg-yellow-400 text-green-900 px-12 py-5 rounded-full font-black text-2xl">הזמינו עכשיו 🛒</button>
+            </div>
+        </section>
+
+        <section id="shop" class="tab-content">
+            <input type="text" id="productSearch" oninput="renderProducts(this.value)" placeholder="חפש מוצר..." class="w-full p-4 rounded-xl border-2 border-gray-200 mb-6 text-right outline-none">
+            <div id="leavesContainer" class="leaves-section hidden mb-6">
+                <h2 class="text-2xl font-black text-green-800 mb-2">🌿 עלים ומארזים - מותר לערבב!</h2>
+                <div id="leavesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+            </div>
+            <div id="loader" class="loading-spinner"></div>
+            <div id="productsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+        </section>
+
+        <section id="how" class="tab-content">
+            <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-green-600">
+                <h2 class="text-3xl font-black mb-6 text-green-800 text-right">איך זה עובד? 💡</h2>
+                <div class="space-y-4 text-lg text-right">
+                    <p>1. בוחרים מוצרים מהקטלוג.</p>
+                    <p>2. מזמינים עד יום שלישי ב-17:00.</p>
+                    <p>3. משלמים באשראי בצורה מאובטחת.</p>
+                    <p>4. אוספים ביום רביעי מנקודת החלוקה.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="vision" class="tab-content">
+            <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-green-600 text-right">
+                <h2 class="text-3xl font-black mb-6 text-green-800">החזון שלנו 🌱</h2>
+                <p class="text-lg leading-relaxed">להביא לכם את התוצרת הכי טרייה במחיר הכי הוגן, תוך בניית קהילה חזקה.</p>
+            </div>
+        </section>
+
+        <section id="policy" class="tab-content">
+            <div class="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-green-600 text-right">
+                <h2 class="text-3xl font-black mb-6 text-green-800">מדיניות שירות 📜</h2>
+                <p>ביטול הזמנה אפשרי עד 48 שעות לפני מועד האיסוף.</p>
+            </div>
+        </section>
     </main>
 
-    <div id="cart-bar" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-11/12 max-w-md hidden">
-        <button onclick="openDrawer(true)" class="w-full bg-green-900 text-white p-5 rounded-full flex justify-between items-center shadow-2xl">
-            <span id="total-price" class="text-xl font-bold">0.00 ₪</span>
-            <span class="font-bold">צפה בסל ושלם 🛒</span>
-        </button>
-    </div>
-
-    <div id="drawer" class="drawer text-right" dir="rtl">
-        <h2 class="text-2xl font-black mb-4">הסל שלי</h2>
-        <div id="cart-items" class="mb-6"></div>
-        <div class="space-y-3">
-            <input type="text" id="cust-name" placeholder="שם מלא" class="w-full p-3 border rounded-xl text-lg text-right">
-            <input type="tel" id="cust-phone" placeholder="טלפון" class="w-full p-3 border rounded-xl text-lg text-right">
-            <select id="cust-loc" class="w-full p-3 border rounded-xl text-lg text-right"><option value="">בחר נקודת איסוף</option></select>
+    <div id="cartWrapper">
+        <div id="floatingCart">
+            <span class="text-2xl font-black" id="totalDisplay">0.00 ₪</span>
+            <button onclick="toggleDrawer(true)" class="bg-yellow-400 text-green-900 px-10 py-3 rounded-full font-black">לתשלום ➔</button>
         </div>
-        <button onclick="pay()" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-xl mt-6">שלם עכשיו 💳</button>
     </div>
 
-    <div id="success-page">
-        <div class="text-6xl mb-4">✅</div>
-        <h1 class="text-3xl font-black mb-2">תודה רבה!</h1>
-        <p class="text-gray-600 mb-6">ההזמנה התקבלה בהצלחה</p>
-        <a id="wa-link" href="#" class="bg-green-500 text-white px-8 py-4 rounded-full font-bold text-lg">שלח אישור בוואטסאפ</a>
+    <div id="orderDrawer">
+        <div class="flex justify-between items-center mb-6">
+            <span class="text-2xl cursor-pointer" onclick="toggleDrawer(false)">✕</span>
+            <h2 class="text-2xl font-black">סיכום הזמנה</h2>
+        </div>
+        <div id="drawerSummary" class="mb-6 bg-gray-50 p-4 rounded-2xl border text-right"></div>
+        <div class="space-y-3">
+            <input type="text" id="custName" placeholder="שם מלא" class="w-full p-4 border rounded-xl text-right">
+            <input type="tel" id="custPhone" placeholder="טלפון" class="w-full p-4 border rounded-xl text-right">
+            <input type="email" id="custEmail" placeholder="אימייל" class="w-full p-4 border rounded-xl text-right">
+            <input type="text" id="custAddress" placeholder="כתובת" class="w-full p-4 border rounded-xl text-right">
+            <select id="pickupPoint" class="w-full p-4 border rounded-xl text-right">
+                <option value="" disabled selected>בחר נקודת איסוף</option>
+            </select>
+            <textarea id="orderNotes" placeholder="הערות..." class="w-full p-4 border rounded-xl text-right h-24"></textarea>
+        </div>
+        <button id="finalPayBtn" onclick="confirmAndPay()" class="w-full bg-green-600 text-white py-5 rounded-2xl font-black text-xl shadow-lg mt-6">אישור ותשלום 💳</button>
     </div>
+    <div class="drawer-overlay" id="overlay" onclick="toggleDrawer(false)"></div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyx3v3SbaJCXHN-FfkcvDVDrmgLXOzj8EjVZP0XqbjbXtmZFayeNqEqXdoH6VQj8FlvWQ/exec';
-        let cart = {}, products = [], settings = {};
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxl2IPiCTEgGZz_ENjDboZMS4lTVOIZjRbll2MhsDM4S7QAZdJHWCZ6JmFZS5vdrvekFA/exec';
+        let products = [], cart = JSON.parse(localStorage.getItem('supersmart_cart') || '{}');
 
-        async function init() {
-            if (new URLSearchParams(window.location.search).has('thankyou')) return showSuccess();
-            const res = await fetch(SCRIPT_URL + '?callback=loadData').then(r => r.text());
-            eval(res);
+        function loadData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            // בדיקה אם חזרנו מתשלום מוצלח
+            if (urlParams.get('success') === 'true' || urlParams.get('Response') === '000') {
+                showThanksScreen();
+            }
+
+            const script = document.createElement('script');
+            script.src = SCRIPT_URL + (SCRIPT_URL.includes('?') ? '&' : '?') + 'callback=processData';
+            document.body.appendChild(script);
         }
 
-        function loadData(data) {
-            data.settings.forEach(r => { if(r[0]) settings[r[0]] = r[1]; });
-            products = data.products.slice(1).map(r => ({ name: r[0], price: parseFloat(r[1])||0, loc: r[3], img: r[5] })).filter(p => p.price > 0);
-            const locs = [...new Set(products.map(p => p.loc).filter(Boolean))];
-            document.getElementById('cust-loc').innerHTML += locs.map(l => `<option value="${l}">${l}</option>`).join('');
-            render();
+        function showThanksScreen() {
+            document.getElementById('thanks-screen').style.display = 'flex';
+            const lastOrder = JSON.parse(localStorage.getItem('last_payload') || '{}');
+            if (lastOrder.name) {
+                const msg = `היי, סיימתי לשלם עבור ההזמנה שלי!\nשם: ${lastOrder.name}\nסה"כ: ${lastOrder.total} ₪\n\nפירוט:\n${lastOrder.details}`;
+                document.getElementById('wa-thanks-link').href = `https://wa.me/972547607110?text=${encodeURIComponent(msg)}`;
+            }
+            localStorage.removeItem('supersmart_cart');
         }
 
-        function render() {
-            document.getElementById('shop').innerHTML = products.map(p => `
-                <div class="card">
-                    <img src="${p.img}" class="h-20 object-contain mb-2">
-                    <h3 class="text-xs font-bold mb-1 h-8 overflow-hidden">${p.name}</h3>
-                    <p class="text-green-700 font-bold mb-2">${p.price.toFixed(2)} ₪</p>
-                    <div class="flex justify-between items-center bg-gray-100 rounded-lg p-1">
-                        <button onclick="update('${p.name}',1)" class="w-8 h-8 bg-white rounded shadow text-xl">+</button>
-                        <span class="font-bold">${cart[p.name] || 0}</span>
-                        <button onclick="update('${p.name}',-1)" class="w-8 h-8 bg-white rounded shadow text-xl">-</button>
-                    </div>
-                </div>`).join('');
+        function processData(data) {
+            if (data.settings.status === "סגור") {
+                document.getElementById('closed-screen').style.display = 'flex';
+                document.getElementById('closedMessage').innerText = data.settings.message || 'החנות סגורה.';
+            }
+            products = data.products.slice(1).map(row => ({
+                name: row[0]?.toString().trim() || '',
+                price: parseFloat(row[1]) || 0,
+                unit: row[2]?.toString().trim() || "יח'",
+                promo: row[6]?.toString().trim() || '',
+                isVip: row[8]?.toString() === '1',
+                category: row[10]?.toString().trim() || '',
+                image: row[7]?.toString().trim() || ''
+            })).filter(p => p.name && p.price > 0);
+
+            const select = document.getElementById('pickupPoint');
+            const points = [...new Set(data.products.slice(1).map(row => row[5]?.trim()).filter(Boolean))];
+            points.forEach(p => select.add(new Option(p, p)));
+
+            document.getElementById('loader').style.display = 'none';
+            renderProducts();
             updateUI();
         }
 
-        function update(n, d) {
-            cart[n] = (cart[n] || 0) + d;
-            if (cart[n] <= 0) delete cart[n];
-            render();
+        function calculatePrice(product, quantity) {
+            if (!product.promo || !product.promo.includes('|')) return product.price * quantity;
+            const [promoQty, promoPrice] = product.promo.split('|').map(parseFloat);
+            if (quantity >= promoQty) {
+                const groups = Math.floor(quantity / promoQty);
+                return (groups * promoPrice) + ((quantity % promoQty) * product.price);
+            }
+            return product.price * quantity;
+        }
+
+        function renderProducts(filter = '') {
+            const mainGrid = document.getElementById('productsGrid');
+            const leavesGrid = document.getElementById('leavesGrid');
+            const leavesContainer = document.getElementById('leavesContainer');
+            let mainHtml = '', leavesHtml = '', hasLeaves = false;
+
+            products.forEach(p => {
+                if (filter && !p.name.includes(filter)) return;
+                const qty = cart[p.name] || 0;
+                const html = `
+                    <div class="product-card p-3 flex flex-col items-center ${p.isVip ? 'vip-card' : ''}">
+                        ${p.isVip ? '<div class="vip-badge">מבצע!</div>' : ''}
+                        <img src="${p.image || 'https://via.placeholder.com/150'}" class="h-24 object-contain mb-2">
+                        <h3 class="font-bold text-center text-xs h-8 overflow-hidden">${p.name}</h3>
+                        <p class="text-green-700 font-black text-sm">${p.price.toFixed(2)} ₪</p>
+                        <div class="flex items-center justify-between w-full bg-gray-100 rounded-lg p-1 mt-2">
+                            <button onclick="updateCart('${encodeURIComponent(p.name)}', -1)" class="w-8 h-8 font-bold">-</button>
+                            <span class="font-bold">${qty}</span>
+                            <button onclick="updateCart('${encodeURIComponent(p.name)}', 1)" class="w-8 h-8 font-bold">+</button>
+                        </div>
+                    </div>`;
+                if(p.category === 'עלים') { leavesHtml += html; hasLeaves = true; } 
+                else { mainHtml += html; }
+            });
+            mainGrid.innerHTML = mainHtml;
+            leavesGrid.innerHTML = leavesHtml;
+            leavesContainer.style.display = (hasLeaves && !filter) ? 'block' : 'none';
+        }
+
+        function updateCart(nameEnc, amt) {
+            const name = decodeURIComponent(nameEnc);
+            cart[name] = Math.max(0, (cart[name] || 0) + amt);
+            if (cart[name] === 0) delete cart[name];
+            localStorage.setItem('supersmart_cart', JSON.stringify(cart));
+            updateUI(); renderProducts(document.getElementById('productSearch').value);
         }
 
         function updateUI() {
-            let total = 0, itemsHtml = '';
+            let total = 0, summary = '';
             for (let n in cart) {
-                const p = products.find(x => x.name === n);
-                total += p.price * cart[n];
-                itemsHtml += `<div class="flex justify-between border-b py-2"><span>${n} (x${cart[n]})</span><span>${(p.price * cart[n]).toFixed(2)} ₪</span></div>`;
+                const p = products.find(prod => prod.name === n);
+                if (p) {
+                    const price = calculatePrice(p, cart[n]);
+                    total += price;
+                    summary += `<div class="flex justify-between py-1 border-b"><span>${n} (x${cart[n]})</span><span>${price.toFixed(2)} ₪</span></div>`;
+                }
             }
-            document.getElementById('total-price').innerText = total.toFixed(2) + ' ₪';
-            document.getElementById('cart-bar').style.display = total > 0 ? 'block' : 'none';
-            document.getElementById('cart-items').innerHTML = itemsHtml;
+            document.getElementById('totalDisplay').innerText = total.toFixed(2) + ' ₪';
+            document.getElementById('cartWrapper').style.display = total > 0 ? 'block' : 'none';
+            document.getElementById('drawerSummary').innerHTML = summary + `<div class="font-bold text-lg mt-2">סה"כ: ${total.toFixed(2)} ₪</div>`;
         }
 
-        function tab(t) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(t).classList.remove('hidden');
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-'+id).classList.add('active');
+            window.scrollTo(0,0);
         }
 
-        function openDrawer(o) { document.getElementById('drawer').classList.toggle('open', o); }
+        function toggleDrawer(open) {
+            document.getElementById('orderDrawer').classList.toggle('open', open);
+            document.getElementById('overlay').classList.toggle('active', open);
+        }
 
-        async function pay() {
-            const name = document.getElementById('cust-name').value;
-            const phone = document.getElementById('cust-phone').value;
-            const loc = document.getElementById('cust-loc').value;
-            if (!name || !phone || !loc) return alert('נא למלא את כל הפרטים');
+        async function confirmAndPay() {
+            const btn = document.getElementById('finalPayBtn');
+            const total = document.getElementById('totalDisplay').innerText.replace(' ₪','');
+            const payload = {
+                name: document.getElementById('custName').value,
+                phone: document.getElementById('custPhone').value,
+                email: document.getElementById('custEmail').value,
+                pickup: document.getElementById('pickupPoint').value,
+                details: Object.entries(cart).map(([n, q]) => `${n} x ${q}`).join('\n'),
+                total: total
+            };
 
-            const total = document.getElementById('total-price').innerText.replace(' ₪', '');
-            const items = Object.entries(cart).map(([n, q]) => `${n} x ${q}`).join('\n');
-            const payload = { name, phone, location: loc, total: total + " ₪", items };
+            if(!payload.name || !payload.phone || !payload.pickup) return alert("נא למלא שם, טלפון ונקודת איסוף");
+
+            btn.disabled = true; btn.innerText = "מעביר לתשלום...";
+            localStorage.setItem('last_payload', JSON.stringify(payload));
             
-            localStorage.setItem('order', JSON.stringify(payload));
-            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-
-            const successUrl = encodeURIComponent(window.location.origin + window.location.pathname + "?thankyou=1");
-            // ניסיון לעקיפה סופית: שימוש בכתובת המקוצרת ביותר ללא lang כלל
-            window.location.href = `https://direct.tranzila.com/fxpsupersmart/?sum=${total}&currency=1&contact=${encodeURIComponent(name)}&phone=${phone}&success_url=${successUrl}`;
-        }
-
-        function showSuccess() {
-            document.getElementById('success-page').style.display = 'flex';
-            const o = JSON.parse(localStorage.getItem('order'));
-            if (o) {
-                const msg = `הזמנה חדשה:\nשם: ${o.name}\nאיסוף: ${o.location}\n\nפריטים:\n${o.items}\n\nסה"כ: ${o.total}`;
-                document.getElementById('wa-link').href = `https://wa.me/972547607110?text=${encodeURIComponent(msg)}`;
+            try {
+                // שמירה בגוגל שיטס
+                await fetch(SCRIPT_URL + "?data=" + encodeURIComponent(JSON.stringify(payload)), { method: 'POST', mode: 'no-cors' });
+                
+                // שליחה לטרנזילה בקישור היציב ביותר
+                const successUrl = encodeURIComponent(window.location.origin + window.location.pathname + '?success=true');
+                window.location.href = `https://direct.tranzila.com/fxpsupersmart/?sum=${total}&currency=1&language=Hebrew&contact=${encodeURIComponent(payload.name)}&phone=${payload.phone}&email=${encodeURIComponent(payload.email)}&success_url=${successUrl}`;
+            } catch (e) {
+                alert("שגיאה קטנה. נסו שוב.");
+                btn.disabled = false;
             }
-            confetti();
         }
-        window.onload = init;
+
+        window.onload = loadData;
     </script>
 </body>
 </html>
